@@ -30,6 +30,7 @@ class NeuralNetwork{
 
     // Constructor to initialize the neural network
     NeuralNetwork(int N_layers, int *N_neurons, int N_inputs, int N_output, std::string F_intern, std::string F_extern, float min=-1, float max=1): n_layers(N_layers), n_inputs(N_inputs), n_output(N_output), n_neurons(N_neurons), f_intern(F_intern), f_extern(F_extern){
+        //Create layers
         layers = new Layer*[n_layers+1];
 
         layers[0] = createLayer(f_intern, n_neurons[0], n_inputs, min, max);
