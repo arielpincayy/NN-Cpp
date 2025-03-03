@@ -5,32 +5,32 @@
 
 class Matrix {
 public:
-    float* matrix; // Puntero para almacenar los datos de la matriz
-    int n;         // Número de filas
-    int m;         // Número de columnas
+    float* matrix; // Pointer to store matrix data
+    int n;         // Number of rows
+    int m;         // Number of columns
 
-    // Constructores
-    Matrix(float* matrix_rw, int n_s, int m_s); // Constructor que copia datos de un arreglo
-    Matrix(int n_s, int m_s);                  // Constructor para matriz vacía
+    // Constructors
+    Matrix(float* matrix_rw, int n_s, int m_s); // Constructor that copies data from an array
+    Matrix(int n_s, int m_s);                  // Constructor for an empty matrix
 
     // Destructor
     ~Matrix();
 
-    // Métodos
-    Matrix *get_row(int i); // Obtener una fila de la matriz
+    // Methods
+    Matrix *get_row(int i); // Retrieve a row from the matrix
     static Matrix* randomMatrix(int n_s, int m_s, float min_val = 0.0, float max_val = 1.0);
 
-    // Operadores sobrecargados
-    Matrix* operator*(const Matrix& other); // Multiplicación de matrices
-    Matrix* operator*(float scale);         // Escalado de matriz
-    Matrix* operator+(const Matrix& other); // Suma de matrices
-    Matrix* operator-(const Matrix& other); // Resta de matrices
+    // Overloaded operators
+    Matrix* operator*(const Matrix& other); // Matrix multiplication
+    Matrix* operator*(float scale);         // Matrix scaling
+    Matrix* operator+(const Matrix& other); // Matrix addition
+    Matrix* operator-(const Matrix& other); // Matrix subtraction
 };
 
-// Sobrecarga del operador * para escalar * matriz
+// Overload of the * operator for scalar * matrix multiplication
 Matrix* operator*(float scale, Matrix& other);
 
-// Sobrecarga del operador << para imprimir la matriz
+// Overload of the << operator to print the matrix
 std::ostream& operator<<(std::ostream& COUT, const Matrix& matrix);
 
 #endif // MATRIX_H

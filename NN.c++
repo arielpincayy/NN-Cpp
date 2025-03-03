@@ -11,22 +11,24 @@
 #define TANH "tanh"
 #define RELU "relu"
 
+// Structure to define a neural network layer
 struct Layer{
-    Matrix *weights;
-    Matrix *bias;
-    std::string activation;
+    Matrix *weights;   // Weight matrix of the layer
+    Matrix *bias;      // Bias matrix of the layer
+    std::string activation; // Activation function of the layer
 };
 
 class NeuralNetwork{
     public:
-    Layer **layers;
-    std::string f_intern;
-    std::string f_extern;
-    int n_layers;
-    int n_neurons;
-    int n_inputs;
-    int n_output;
+    Layer **layers;      // Array of pointers to layers
+    std::string f_intern; // Internal activation function
+    std::string f_extern; // Output activation function
+    int n_layers;        // Number of layers
+    int n_neurons;       // Number of neurons per hidden layer
+    int n_inputs;        // Number of input neurons
+    int n_output;        // Number of output neurons
 
+    // Constructor to initialize the neural network
     NeuralNetwork(int N_layers, int N_neurons, int N_inputs, int N_output, std::string F_intern, std::string F_extern, float min=-1, float max=1): n_layers(N_layers), n_inputs(N_inputs), n_output(N_output), n_neurons(N_neurons), f_intern(F_intern), f_extern(F_extern){
         layers = new Layer*[n_layers];
         int prev_neurons = n_inputs;
@@ -39,6 +41,7 @@ class NeuralNetwork{
         layers[n_layers - 1] = createLayer(f_extern, n_output, prev_neurons, min, max);
     };
 
+    // Forward propagation function
     Matrix *predict(Matrix *input, bool normlzt = false){
         if(normlzt) normalization(input, n_inputs);
 
@@ -53,6 +56,7 @@ class NeuralNetwork{
         return input;
     };
 
+    // Destructor to free memory
     ~NeuralNetwork() {
         for (int i = 0; i < n_layers; i++) {
             delete layers[i]->weights;
@@ -63,6 +67,7 @@ class NeuralNetwork{
     };
 
     private:
+    // Activation function computation
     float fns(std::string activation, float x){
         if(activation == LINEAR) return x;
         if(activation == TANH) return tanh(x);
@@ -71,11 +76,13 @@ class NeuralNetwork{
         return 0;
     };
 
+    // Apply activation function to matrix
     Matrix *act(std::string activation, Matrix *x){
         for(int i=0; i<x->n*x->m; i++) x->matrix[i] = fns(activation, x->matrix[i]);
         return x;
     }
 
+    // Create a layer with specified parameters
     Layer *createLayer(std::string f_activation, int n, int m, float min, float max){
         Layer *layer = new Layer;
         layer->weights = Matrix::randomMatrix(n, m, min, max);
@@ -85,6 +92,7 @@ class NeuralNetwork{
         return layer;
     };
 
+    // Normalize input matrix
     void normalization(Matrix *input, int n){
         float mean = 0;
         float dstd = 0;
@@ -99,15 +107,15 @@ class NeuralNetwork{
 
 int main(){
     
-    float xor_data[] = {0,0,0,1,1,0,1,1};
-    float xor_labels[] = {0,1,1,0};
-    float input[] = {1, 0};
+    float xor_data[] = {0,0,0,1,1,0,1,1}; // XOR input data
+    float xor_labels[] = {0,1,1,0};       // XOR expected output
+    float input[] = {1, 0};               // Example input
 
     Matrix *Input = new Matrix(input, 2, 1);
     Matrix *Xor_data = new Matrix(xor_data, 4, 2);
     Matrix *Xor_labels = new Matrix(xor_labels, 4, 1);
 
-
+    // Create a neural network with 64 layers, 32 neurons per layer, and using SIGMOID and TANH activations
     std::unique_ptr<NeuralNetwork> NN = std::make_unique<NeuralNetwork>(64,32,2,1,SIGMOID,TANH);
 
     return 0;
