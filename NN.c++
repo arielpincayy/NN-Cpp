@@ -24,21 +24,23 @@ class NeuralNetwork{
     std::string f_intern; // Internal activation function
     std::string f_extern; // Output activation function
     int n_layers;        // Number of layers
-    int n_neurons;       // Number of neurons per hidden layer
+    int *n_neurons;       // Number of neurons per hidden layer
     int n_inputs;        // Number of input neurons
     int n_output;        // Number of output neurons
 
     // Constructor to initialize the neural network
-    NeuralNetwork(int N_layers, int N_neurons, int N_inputs, int N_output, std::string F_intern, std::string F_extern, float min=-1, float max=1): n_layers(N_layers), n_inputs(N_inputs), n_output(N_output), n_neurons(N_neurons), f_intern(F_intern), f_extern(F_extern){
-        layers = new Layer*[n_layers];
-        int prev_neurons = n_inputs;
+    NeuralNetwork(int N_layers, int *N_neurons, int N_inputs, int N_output, std::string F_intern, std::string F_extern, float min=-1, float max=1): n_layers(N_layers), n_inputs(N_inputs), n_output(N_output), n_neurons(N_neurons), f_intern(F_intern), f_extern(F_extern){
+        layers = new Layer*[n_layers+1];
+
+        layers[0] = createLayer(f_intern, n_neurons[0], n_inputs, min, max);
+        int prev_neurons = n_neurons[0];
 
         for(int i=0; i<n_layers - 1; i++){
-            layers[i] = createLayer(f_intern, n_neurons, prev_neurons, min, max);
-            prev_neurons = n_neurons;
+            layers[i+1] = createLayer(f_intern, n_neurons[i+1], prev_neurons, min, max);
+            prev_neurons = n_neurons[i+1];
         }
 
-        layers[n_layers - 1] = createLayer(f_extern, n_output, prev_neurons, min, max);
+        layers[n_layers] = createLayer(f_extern, n_output, prev_neurons, min, max);
     };
 
     // Forward propagation function
@@ -115,8 +117,12 @@ int main(){
     Matrix *Xor_data = new Matrix(xor_data, 4, 2);
     Matrix *Xor_labels = new Matrix(xor_labels, 4, 1);
 
-    // Create a neural network with 64 layers, 32 neurons per layer, and using SIGMOID and TANH activations
-    std::unique_ptr<NeuralNetwork> NN = std::make_unique<NeuralNetwork>(64,32,2,1,SIGMOID,TANH);
+    int N_neurons[] = {16, 32, 64}; // Number of neurons per hidden layer
+    int N_layers = 3;           // Number of layers
+
+    std::unique_ptr<NeuralNetwork> NN = std::make_unique<NeuralNetwork>(N_layers, N_neurons, 2, 1, SIGMOID, SIGMOID);
+    Matrix *output = NN->predict(Input, true);
+    std::cout << "Output: " << *output->matrix << '\n';
 
     return 0;
 }
