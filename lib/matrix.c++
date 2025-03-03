@@ -1,0 +1,106 @@
+#include "matrix.h"
+#include <random>
+#include <stdexcept>
+
+// Constructor que copia datos de un arreglo
+Matrix::Matrix(float* matrix_rw, int n_s, int m_s) : n(n_s), m(m_s) {
+    matrix = new float[n * m];
+    for (int i = 0; i < n * m; i++) matrix[i] = matrix_rw[i];
+}
+
+// Constructor para matriz vacía
+Matrix::Matrix(int n_s, int m_s) : n(n_s), m(m_s) {
+    matrix = new float[n * m]();
+}
+
+// Destructor
+Matrix::~Matrix() {
+    delete[] matrix;
+}
+
+// Obtener una fila de la matriz
+Matrix* Matrix::get_row(int i) {
+    Matrix* row = new Matrix(m, 1);
+    for (int j = 0; j < m; j++) {
+        row->matrix[j] = matrix[i * m + j];
+    }
+    return row;
+}
+
+// Generar matriz aleatoria
+Matrix* Matrix::randomMatrix(int n_s, int m_s, float min_val, float max_val) {
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_real_distribution<float> distribution(min_val, max_val);
+
+    Matrix* result = new Matrix(n_s, m_s);
+    for (int i = 0; i < n_s * m_s; i++) {
+        result->matrix[i] = distribution(generator);
+    }
+    return result;
+}
+
+// Multiplicación de matrices
+Matrix* Matrix::operator*(const Matrix& other) {
+    if (m != other.n){
+        std::cout<< n << ' ' << m <<' '<< other.n << ' ' << other.m <<'\n';
+        throw std::invalid_argument("Dimensiones incompatibles para la multiplicación de matrices.");
+    }
+
+    Matrix* A = new Matrix(n, other.m);
+    for (int i = 0; i < A->n; i++) {
+        for (int j = 0; j < A->m; j++) {
+            for (int k = 0; k < m; k++) {
+                A->matrix[i * A->m + j] += matrix[i * m + k] * other.matrix[k * other.m + j];
+            }
+        }
+    }
+    return A;
+}
+
+// Suma de matrices
+Matrix* Matrix::operator+(const Matrix& other) {
+    if (n != other.n || m != other.m) throw std::invalid_argument("Dimensiones incompatibles para la suma de matrices.");
+
+    Matrix* A = new Matrix(n, m);
+    for (int i = 0; i < n * m; i++) {
+        A->matrix[i] = matrix[i] + other.matrix[i];
+    }
+    return A;
+}
+
+// Resta de matrices
+Matrix *Matrix::operator-(const Matrix& other) {
+    if (n != other.n || m != other.m) throw std::invalid_argument("Dimensiones incompatibles para la resta de matrices.");
+
+    Matrix* A = new Matrix(n, m);
+    for (int i = 0; i < n * m; i++) {
+        A->matrix[i] = matrix[i] - other.matrix[i];
+    }
+    return A;
+}
+
+// Escalado de matriz
+Matrix* Matrix::operator*(float scale) {
+    Matrix* A = new Matrix(n, m);
+    for (int i = 0; i < n * m; i++) {
+        A->matrix[i] = scale * matrix[i];
+    }
+    return A;
+}
+
+// Escalar * matriz
+Matrix* operator*(float scale, Matrix& other) {
+    return other * scale;
+}
+
+// Imprimir matriz
+std::ostream& operator<<(std::ostream& COUT, const Matrix& matrix) {
+    for (int i = 0; i < matrix.n; ++i) {
+        for (int j = 0; j < matrix.m; ++j) {
+            COUT << matrix.matrix[i * matrix.m + j] << " ";
+        }
+        COUT << "\n";
+    }
+    return COUT;
+}
